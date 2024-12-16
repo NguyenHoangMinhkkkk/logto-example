@@ -1,78 +1,94 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import { Button, Text, View } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import {
+  LogtoConfig,
+  LogtoProvider,
+  Prompt,
+  ReservedScope,
+  useLogto,
+  UserScope,
+} from "@logto/rn";
+import { useEffect, useState } from "react";
+
+const logtoConfig: LogtoConfig = {
+  appId: "lx2l0yq69d9q9p8u4xtbt",
+  endpoint: "https://qa-logto.ilotusland.asia/",
+  resources: ["https://qa-x.ilotusland.asia/api/config/v1"],
+  scopes: [
+    UserScope.CustomData,
+    UserScope.Email,
+    UserScope.Identities,
+    UserScope.OrganizationRoles,
+    UserScope.Organizations,
+    UserScope.Phone,
+    UserScope.Profile,
+    UserScope.Roles,
+    ReservedScope.OfflineAccess,
+    ReservedScope.OpenId,
+  ],
+  prompt: Prompt.Login,
+  includeReservedScopes: false,
+};
+
+const Content = () => {
+  const {
+    signIn,
+    signOut,
+    getAccessToken,
+    isAuthenticated,
+    getIdTokenClaims,
+    getRefreshToken,
+  } = useLogto();
+  const [user, setUser] = useState(null);
+  const [at, setAT] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      try {
+        getAccessToken().then((accessToken) => {
+          setAT(accessToken);
+        });
+        getIdTokenClaims().then((claims) => {
+          setUser(claims);
+        });
+        getRefreshToken().then((rfToken) => {
+          console.log("==========rfToken-rfToken=======", rfToken);
+        });
+      } catch (error) {
+        console.log("==========error=======", error);
+      }
+    }
+  }, [isAuthenticated]);
+
+  return isAuthenticated ? (
+    <View>
+      <Text>{`AccessToken: ${JSON.stringify(at, undefined, 2)}`}</Text>
+      <Text>{`\n--------------------------\n`}</Text>
+      <Text>{`User Info: ${JSON.stringify(user, undefined, 2)}`}</Text>
+      <Button title="Sign Out" onPress={() => signOut()} />
+    </View>
+  ) : (
+    <Button
+      title="Sign In"
+      onPress={async () =>
+        signIn({
+          redirectUri: "io.logto://callback",
+          loginHint: "minh@ill.com",
+          prompt: Prompt.Login,
+        }).catch((err) => {
+          console.log("==========err-1=======", err);
+        })
+      }
+    />
+  );
+};
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <LogtoProvider config={logtoConfig}>
+      <View style={{ flex: 1, paddingTop: 100 }}>
+        <Content />
+      </View>
+    </LogtoProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-});

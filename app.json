@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "expo": {
-      "entryPoint": "./src/app"
+      "entryPoint": "./src/app",
+      "scheme": "io.logto://callback"
     },
     "ios": {
       "supportsTablet": true,
