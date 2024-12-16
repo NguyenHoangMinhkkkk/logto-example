@@ -26,11 +26,13 @@ const logtoConfig: LogtoConfig = {
     ReservedScope.OfflineAccess,
     ReservedScope.OpenId,
   ],
-  prompt: Prompt.Login,
   includeReservedScopes: false,
 };
 
 const Content = () => {
+  const [user, setUser] = useState(null);
+  const [at, setAT] = useState(null);
+
   const {
     signIn,
     signOut,
@@ -39,8 +41,6 @@ const Content = () => {
     getIdTokenClaims,
     getRefreshToken,
   } = useLogto();
-  const [user, setUser] = useState(null);
-  const [at, setAT] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -52,7 +52,7 @@ const Content = () => {
           setUser(claims);
         });
         getRefreshToken().then((rfToken) => {
-          console.log("==========rfToken-rfToken=======", rfToken);
+          console.log("==========rfToken-rfToken=======", rfToken); // -> null
         });
       } catch (error) {
         console.log("==========error=======", error);

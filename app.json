@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nguyenhoangminh.my-app"
+      "bundleIdentifier": "com.ilotusland.document"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nguyenhoangminh.myapp"
+      "package": "com.ilotusland.document"
     },
     "web": {
       "bundler": "metro",
